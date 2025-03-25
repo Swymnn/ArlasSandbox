@@ -33,6 +33,9 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
+              "src/config.json",
+              "src/settings.yaml",
+              "src/assets",
               {
                 "glob": "**/*",
                 "input": "public"
@@ -69,6 +72,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "buildTarget": "AngularSandbox:build"
+          },
           "configurations": {
             "production": {
               "buildTarget": "AngularSandbox:build:production"
