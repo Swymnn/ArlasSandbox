@@ -34,6 +34,9 @@ import {
   defaultBasemapStyle, basemapStyles, geojsondata, drawOptions, mapDataSources, mapLayers,
   mapSources, visualisationSets
 } from '../../../utils/map.constants';
+import { FeatureCollection, Geometry } from 'geojson';
+import { LocalArlasMapService } from '../../services/local-arlas-map.service';
+import { DefaultMapSettingsService } from '../../services/default-map-settings.service';
 
 @Component({
   selector: 'app-map',
@@ -69,12 +72,15 @@ export class MapComponent<L, S, M> {
 
   public visibilityUpdater = new Subject<Map<string, boolean>>();
 
-  public drawData = {
+  public drawData: FeatureCollection<Geometry> = {
     'type': 'FeatureCollection',
     'features': []
-  } as any;
+  };
 
-  public constructor() { }
+  public constructor(
+    private readonly localArlasMapService: LocalArlasMapService,
+    private readonly defaultMapSettingsService: DefaultMapSettingsService
+  ) { }
 
   public polygonChange(event: any) {
     console.log(event);
@@ -124,135 +130,18 @@ export class MapComponent<L, S, M> {
   });
 
   public openSettings() {
-    this.mapSettings.openDialog(new MapSettings());
+    this.mapSettings.openDialog(this.defaultMapSettingsService);
   }
 
   public onMapLoaded() {
     this.mapComponent.visibilityStatus = new Map();
     this.mapComponent.visibilityStatus.set('All products' + ARLAS_VSET + 'arlas_id:Number of products:1677155990578', true);
     this.mapComponent.visibilityStatus.set('Latest products' + ARLAS_VSET + 'arlas_id:Latest products:1677155839933', false);
-  }
-}
 
-export class MapSettings implements MapSettingsService {
-  public getClusterGeometries(): Array<GeometrySelectModel> {
-    const clusterDisplayGeometries = new Array<GeometrySelectModel>();
-    for (let i = 0; i < 5; i++) {
-      clusterDisplayGeometries.push({
-        path: 'point-' + i,
-        selected: i === 1
-      });
-    }
-    return clusterDisplayGeometries;
-  }
-
-  public getAllGeometries(): Array<GeometrySelectModel> {
-    const allDisplayGeometries = new Array<GeometrySelectModel>();
-    for (let i = 0; i < 8; i++) {
-      if (i < 5) {
-        allDisplayGeometries.push({
-          path: 'point-' + i,
-          selected: i === 1
-        });
-      } else {
-        allDisplayGeometries.push({
-          path: 'geometry-' + (i - 4),
-          selected: i === 5 || i === 7
-        });
+    this.localArlasMapService.getAois().subscribe({
+      next: (aois) => {
+        this.drawData = aois;
       }
-    }
-    return allDisplayGeometries;
-  }
-
-  public getFeatureGeometries(): Array<GeometrySelectModel> {
-    const featuresGeometries = new Array<GeometrySelectModel>();
-    for (let i = 0; i < 8; i = i + 2) {
-      if (i < 5) {
-        featuresGeometries.push({
-          path: 'point-' + i,
-          selected: i === 1
-        });
-      } else {
-        featuresGeometries.push({
-          path: 'geometry-' + (i - 4),
-          selected: i === 5 || i === 7
-        });
-      }
-    }
-    return featuresGeometries;
-  }
-
-  public getTopologyGeometries(): Array<GeometrySelectModel> {
-    const topologyGeometries = new Array<GeometrySelectModel>();
-    for (let i = 0; i < 8; i = i + 3) {
-      if (i < 5) {
-        topologyGeometries.push({
-          path: 'point-' + i,
-          selected: i === 1
-        });
-      } else {
-        topologyGeometries.push({
-          path: 'geometry-' + (i - 4),
-          selected: i === 5 || i === 7
-        });
-      }
-    }
-    return topologyGeometries;
-  }
-
-  public getFilterGeometries(): Array<GeometrySelectModel> {
-    const filterGeometries = new Array<GeometrySelectModel>();
-    for (let i = 0; i < 8; i++) {
-      if (i < 5) {
-        filterGeometries.push({
-          path: 'point-' + i,
-          selected: i === 3
-        });
-      } else {
-        filterGeometries.push({
-          path: 'geometry-' + (i - 4),
-          selected: false
-        });
-      }
-    }
-    return filterGeometries;
-  }
-  public getOperations(): Array<OperationSelectModel> {
-    return [
-      {
-        operation: GeoQueryOperator.WITHIN,
-        selected: true
-      },
-      {
-        operation: GeoQueryOperator.NOT_WITHIN,
-        selected: false
-      },
-      {
-        operation: GeoQueryOperator.INTERSECTS,
-        selected: false
-      },
-      {
-        operation: GeoQueryOperator.NOT_INTERSECTS,
-        selected: false
-      }
-    ];
-  }
-
-  public getGeoQueries(): Map<string, [GeometrySelectModel[], OperationSelectModel[], string]> {
-    const geoQueriesMap = new Map<string, [GeometrySelectModel[], OperationSelectModel[], string]>();
-    geoQueriesMap.set('Test', [[{ path: '_centroid' }], this.getOperations(), 'Display name Test']);
-    return geoQueriesMap;
-  }
-
-  public hasFeaturesMode(): boolean {
-    return true;
-  }
-
-  public hasTopologyMode(): boolean {
-    return true;
-  }
-
-  public hasClusterMode(): boolean {
-    return false;
+    })
   }
 }
