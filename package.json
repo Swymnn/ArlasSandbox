@@ -20,6 +20,8 @@
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
+    "arlas-map": "^27.0.0",
+    "arlas-mapbox": "^27.0.7",
     "arlas-wui-toolkit": "^27.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
