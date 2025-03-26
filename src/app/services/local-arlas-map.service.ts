@@ -43,7 +43,7 @@ export class LocalArlasMapService {
         {
           type: "Feature",
           properties: {
-            id: 1,
+            id: 2,
             name: "Mesh of Area of Interest 1",
             category: "urban",
             area: 2.5,

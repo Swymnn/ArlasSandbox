@@ -32,6 +32,7 @@ export function getStyle(name: string) {
     image: `https://cloud.maptiler.com/static/img/maps/${name}.png`
   })
 }
+
 export const basemapStyles = [
   getStyle('basic'),
   getStyle('bright'),
@@ -45,7 +46,7 @@ export const geojsondata = {
 
 export const mapLayers = {
   layers: [{
-    id: 'arlas_id:Latest products:1677155839933',
+    id: 'arlas_id:polygon_layer',
     type: 'fill',
     source: 'feature-_geometry_wkt-window-demo_eo',
     minzoom: 0,
@@ -105,109 +106,7 @@ export const mapLayers = {
     ]
   },
     {
-      id: 'arlas_id:Density of products:1677155972496',
-      type: 'circle',
-      source: 'cluster-_centroid_wkt-Coarse-tile-centroid-demo_eo',
-      minzoom: 0,
-      maxzoom: 15,
-      layout: {
-        'visibility': 'visible'
-      },
-      paint: {
-        'circle-opacity': [
-          'interpolate',
-          [
-            'linear'
-          ],
-          [
-            'get',
-            'count_:normalized'
-          ],
-          0,
-          0,
-          0.2,
-          0.02,
-          0.4,
-          0.04,
-          0.6,
-          0.06000000000000001,
-          0.8,
-          0.08,
-          1,
-          0.1
-        ],
-        'circle-color': [
-          'interpolate',
-          [
-            'linear'
-          ],
-          [
-            'get',
-            'count_:normalized'
-          ],
-          0,
-          '#fffa83',
-          0.45,
-          '#ffcc26',
-          0.9,
-          '#ff7700',
-          1,
-          '#ff5700'
-        ],
-        'circle-radius': [
-          'interpolate',
-          [
-            'linear'
-          ],
-          [
-            'get',
-            'count_:normalized'
-          ],
-          0,
-          5,
-          0.2,
-          14,
-          0.4,
-          23,
-          0.6,
-          32,
-          0.8,
-          41,
-          1,
-          50
-        ],
-        'circle-stroke-width': 2,
-        'circle-stroke-color': [
-          'interpolate',
-          [
-            'linear'
-          ],
-          [
-            'get',
-            'count_:normalized'
-          ],
-          0,
-          '#fff500',
-          0.8,
-          '#ffa700',
-          1,
-          '#ff5418'
-        ],
-        'circle-stroke-opacity': 1
-      },
-      metadata: {
-        collection: 'demo_eo',
-        'collection-display-name': 'demo_eo'
-      },
-      filter: [
-        'all',
-        [
-          'all'
-        ]
-      ]
-    },
-    {
-      id: 'arlas_id:Number of products:1677155990578',
+      id: 'arlas_id:mesh_layer',
       type: 'symbol',
       source: 'cluster-_centroid_wkt-Coarse-tile-centroid-demo_eo',
       minzoom: 0,
@@ -291,8 +190,8 @@ export const mapDataSources = new Set(['feature-_geometry_wkt-window-demo_eo', '
 
 export const mapSources = [
   {
-    'id': 'arlas_id:Latest products:1677155839933',
-    'name': 'Latest products',
+    'id': 'arlas_id:polygon_layer',
+    'name': 'Polygon',
     'source': 'feature-_geometry_wkt-window-demo_eo',
     'minzoom': 0,
     'maxzoom': 22,
@@ -310,47 +209,8 @@ export const mapSources = [
     'render_mode': 'window'
   },
   {
-    'id': 'arlas_id:Density of products:1677155972496',
-    'name': 'Density of products',
-    'source': 'cluster-_centroid_wkt-Coarse-tile-centroid-demo_eo',
-    'minzoom': 0,
-    'maxzoom': 15,
-    'include_fields': [],
-    'short_form_fields': [],
-    'colors_from_fields': [],
-    'provided_fields': [],
-    'normalization_fields': [],
-    'metrics': [
-      {
-        'field': '',
-        'metric': 'count',
-        'normalize': true
-      },
-      {
-        'field': '',
-        'metric': 'count',
-        'normalize': true
-      },
-      {
-        'field': '',
-        'metric': 'count',
-        'normalize': true
-      },
-      {
-        'field': '',
-        'metric': 'count',
-        'normalize': true
-      }
-    ],
-    'agg_geo_field': '_centroid_wkt',
-    'aggType': 'tile',
-    'granularity': 'Coarse',
-    'minfeatures': 1000,
-    'aggregated_geometry': 'centroid'
-  },
-  {
-    'id': 'arlas_id:Number of products:1677155990578',
-    'name': 'Number of products',
+    'id': 'arlas_id:mesh_layer',
+    'name': 'Mesh',
     'source': 'cluster-_centroid_wkt-Coarse-tile-centroid-demo_eo',
     'minzoom': 0,
     'maxzoom': 15,
@@ -380,18 +240,19 @@ export const mapSources = [
   }
 ];
 
-export const visualisationSets: Array<VisualisationSetConfig> = [{
-  'name': 'Latest products',
-  'layers': [
-    'arlas_id:Latest products:1677155839933'
-  ],
-  'enabled': true
-},
+export const visualisationSets: Array<VisualisationSetConfig> = [
   {
-    'name': 'All products',
+    'name': 'Polygon',
     'layers': [
-      'arlas_id:Number of products:1677155990578',
-      'arlas_id:Density of products:1677155972496'
+      'arlas_id:polygon_layer'
     ],
     'enabled': true
-  }];
+  },
+  {
+    'name': 'Mesh',
+    'layers': [
+      'arlas_id:mesh_layer',
+    ],
+    'enabled': false
+  }
+];

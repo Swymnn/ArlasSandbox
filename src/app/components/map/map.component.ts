@@ -42,7 +42,7 @@ import { DefaultMapSettingsService } from '../../services/default-map-settings.s
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss']
 })
-export class MapComponent<L, S, M> {
+export class MapComponent<L, S, M>  {
 
   @ViewChild('demoMap', { static: true })
   public mapComponent!: ArlasMapComponent<L, S, M>;
@@ -54,8 +54,6 @@ export class MapComponent<L, S, M> {
   public mapSettings!: MapSettingsComponent;
 
   public modeChoice = 'all';
-  public enableDraw = true;
-  public enableMesh = false;
   public idToSelect: number = 0;
   public actionDisabled = false;
   public drawEnabled = true;
@@ -78,7 +76,12 @@ export class MapComponent<L, S, M> {
     'features': []
   };
 
-  public meshData: FeatureCollection<Geometry> = {
+  public meshDataToDraw: FeatureCollection<Geometry> = {
+    'type': 'FeatureCollection',
+    'features': []
+  }
+
+  public polygonDataToDrow: FeatureCollection<Geometry> = {
     'type': 'FeatureCollection',
     'features': []
   }
@@ -89,28 +92,38 @@ export class MapComponent<L, S, M> {
   ) { }
 
   public toggleDraw() {
-    this.enableDraw = !this.enableDraw;
+    const polygonLayer = this.mapComponent.visibilityStatus.get('polygons' + ARLAS_VSET + 'arlas_id:polygons');
+    if (polygonLayer !== undefined) {
+      this.mapComponent.visibilityStatus.set('polygons' + ARLAS_VSET + 'arlas_id:polygons', !polygonLayer);
+      this.updateDrawData();
+    }
   }
 
   public toggleMesh() {
-    this.enableMesh = !this.enableMesh;
+    const meshLayer = this.mapComponent.visibilityStatus.get('meshs' + ARLAS_VSET + 'arlas_id:meshs');
+    if (meshLayer !== undefined) {
+      this.mapComponent.visibilityStatus.set('meshs' + ARLAS_VSET + 'arlas_id:meshs', !meshLayer);
+      this.updateDrawData();
+    }
   }
 
-  public getDrawData(): FeatureCollection<Geometry> {
-    const drawData: FeatureCollection<Geometry> = {
+  private updateDrawData() {
+    const updatedDrawData: FeatureCollection<Geometry> = {
       type: 'FeatureCollection',
       features: []
     }
 
-    if (this.enableDraw) {
-      drawData.features = this.drawData.features;
+    const polygonLayer = this.mapComponent.visibilityStatus.get('polygons' + ARLAS_VSET + 'arlas_id:polygons');
+    if (polygonLayer !== undefined && polygonLayer) {
+      updatedDrawData.features = updatedDrawData.features.concat(this.polygonDataToDrow.features);
     }
 
-    if (this.enableMesh) {
-      drawData.features = drawData.features.concat(this.meshData.features);
+    const meshLayer = this.mapComponent.visibilityStatus.get('meshs' + ARLAS_VSET + 'arlas_id:meshs');
+    if (meshLayer !== undefined && meshLayer) {
+      updatedDrawData.features = updatedDrawData.features.concat(this.meshDataToDraw.features);
     }
 
-    return drawData;
+    this.drawData = updatedDrawData;
   }
 
   public polygonChange(event: any) {
@@ -156,6 +169,10 @@ export class MapComponent<L, S, M> {
     console.log(event);
   }
 
+  public onFeatureClick(event: any) {
+    console.log(event);
+  }
+
   public transformRequest = (url: string, resourceType: string) => ({
     url: url.replace('http', 'http'),
   });
@@ -166,19 +183,21 @@ export class MapComponent<L, S, M> {
 
   public onMapLoaded() {
     this.mapComponent.visibilityStatus = new Map();
-    this.mapComponent.visibilityStatus.set('All products' + ARLAS_VSET + 'arlas_id:Number of products:1677155990578', true);
-    this.mapComponent.visibilityStatus.set('Latest products' + ARLAS_VSET + 'arlas_id:Latest products:1677155839933', false);
+    this.mapComponent.visibilityStatus.set('polygons' + ARLAS_VSET + 'arlas_id:polygons', true);
+    this.mapComponent.visibilityStatus.set('meshs' + ARLAS_VSET + 'arlas_id:meshs', false);
 
     this.localArlasMapService.getAois().subscribe({
       next: (aois) => {
-        this.drawData = aois;
+        this.polygonDataToDrow = aois;
       }
     });
 
     this.localArlasMapService.getMeshs().subscribe({
       next: (meshs) => {
-        this.meshData = meshs;
+        this.meshDataToDraw = meshs;
       }
-    })
+    });
+
+    this.updateDrawData();
   }
 }

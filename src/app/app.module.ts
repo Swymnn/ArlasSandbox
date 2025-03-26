@@ -17,7 +17,7 @@ import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
-import { ArlasMapboxModule, ArlasMapboxService, MapboxBasemapService, MapboxLegendService } from 'arlas-mapbox';
+import { ArlasMapboxModule, ArlasMapboxService, MapboxBasemapService, MapboxLegendService, ArlasMapService as ArlasMaboxMapService } from 'arlas-mapbox';
 import { LocalArlasMapService } from './services/local-arlas-map.service';
 import { DefaultMapSettingsService } from './services/default-map-settings.service';
 import { MatButtonToggle } from '@angular/material/button-toggle';
@@ -49,7 +49,7 @@ import { MatButtonToggle } from '@angular/material/button-toggle';
     DefaultMapSettingsService,
     {
       provide: AbstractArlasMapService,
-      useClass: ArlasMapService
+      useClass: ArlasMaboxMapService
     },
     {
       provide: BasemapService,
