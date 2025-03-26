@@ -24,10 +24,9 @@ import { Component, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import {
   ARLAS_VSET,
-  ArlasMapComponent, GeometrySelectModel, GeoQueryOperator,
+  ArlasMapComponent,
   MapImportComponent,
   MapSettingsComponent,
-  MapSettingsService, OperationSelectModel,
   VisualisationSetConfig
 } from 'arlas-map';
 import {
@@ -55,6 +54,8 @@ export class MapComponent<L, S, M> {
   public mapSettings!: MapSettingsComponent;
 
   public modeChoice = 'all';
+  public enableDraw = true;
+  public enableMesh = false;
   public idToSelect: number = 0;
   public actionDisabled = false;
   public drawEnabled = true;
@@ -77,10 +78,40 @@ export class MapComponent<L, S, M> {
     'features': []
   };
 
+  public meshData: FeatureCollection<Geometry> = {
+    'type': 'FeatureCollection',
+    'features': []
+  }
+
   public constructor(
     private readonly localArlasMapService: LocalArlasMapService,
     private readonly defaultMapSettingsService: DefaultMapSettingsService
   ) { }
+
+  public toggleDraw() {
+    this.enableDraw = !this.enableDraw;
+  }
+
+  public toggleMesh() {
+    this.enableMesh = !this.enableMesh;
+  }
+
+  public getDrawData(): FeatureCollection<Geometry> {
+    const drawData: FeatureCollection<Geometry> = {
+      type: 'FeatureCollection',
+      features: []
+    }
+
+    if (this.enableDraw) {
+      drawData.features = this.drawData.features;
+    }
+
+    if (this.enableMesh) {
+      drawData.features = drawData.features.concat(this.meshData.features);
+    }
+
+    return drawData;
+  }
 
   public polygonChange(event: any) {
     console.log(event);
@@ -141,6 +172,12 @@ export class MapComponent<L, S, M> {
     this.localArlasMapService.getAois().subscribe({
       next: (aois) => {
         this.drawData = aois;
+      }
+    });
+
+    this.localArlasMapService.getMeshs().subscribe({
+      next: (meshs) => {
+        this.meshData = meshs;
       }
     })
   }

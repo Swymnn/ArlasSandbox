@@ -11,6 +11,8 @@
     <mat-radio-button class="polygon-radio" value="selected">Selected</mat-radio-button>
     <mat-radio-button class="polygon-radio" value="id">By id</mat-radio-button>
   </mat-radio-group>
+  <mat-button-toggle class="draw-radio" value="draw" [checked]="enableDraw" (click)="toggleDraw()">Draw</mat-button-toggle>
+  <mat-button-toggle class="draw-radio" value="mesh" [checked]="enableMesh" (click)="toggleMesh()">Mesh</mat-button-toggle>
   <input type="number" class="polygon-input" [(ngModel)]="idToSelect" *ngIf="this.modeChoice === 'id'">
 </div>
 <div class="mapgl-options">
@@ -31,7 +33,7 @@
   <arlas-map #demoMap [defaultBasemapStyle]="defaultBasemapStyle" [basemapStyles]="basemapStyles"
              [margePanForLoad]=40 [margePanForTest]=2 [mapLayers]="mapLayers"
              [displayScale]=true [displayCurrentCoordinates]=true [minZoom]=1 [maxZoom]=28 (onPolygonChange)="polygonChange($event)"
-             (onPolygonSelect)="polygonSelect($event)" [drawOption]="drawOptions" [drawData]="drawData" [drawButtonEnabled]="true"
+             (onPolygonSelect)="polygonSelect($event)" [drawOption]="drawOptions" [drawData]="getDrawData()" [drawButtonEnabled]="true"
              [drawPolygonVerticesLimit]="5" [transformRequest]="transformRequest" (onAoiChanged)="onAoiChanged($event)"
              [visualisationSetsConfig]="visualisationSets" [visibilityUpdater]="visibilityUpdater"
              (onMapLoaded)="onMapLoaded()" [dataSources]="mapDataSources">

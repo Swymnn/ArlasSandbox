@@ -20,6 +20,7 @@ import { FormsModule } from '@angular/forms';
 import { ArlasMapboxModule, ArlasMapboxService, MapboxBasemapService, MapboxLegendService } from 'arlas-mapbox';
 import { LocalArlasMapService } from './services/local-arlas-map.service';
 import { DefaultMapSettingsService } from './services/default-map-settings.service';
+import { MatButtonToggle } from '@angular/material/button-toggle';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { DefaultMapSettingsService } from './services/default-map-settings.servi
     MatIcon,
     ArlasMapModule,
     ArlasMapboxModule,
-    FormsModule
+    FormsModule,
+    MatButtonToggle
   ],
   providers: [
     provideAnimationsAsync(),
