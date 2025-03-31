@@ -91,41 +91,6 @@ export class MapComponent<L, S, M>  {
     private readonly defaultMapSettingsService: DefaultMapSettingsService
   ) { }
 
-  public toggleDraw() {
-    const polygonLayer = this.mapComponent.visibilityStatus.get('polygons' + ARLAS_VSET + 'arlas_id:polygons');
-    if (polygonLayer !== undefined) {
-      this.mapComponent.visibilityStatus.set('polygons' + ARLAS_VSET + 'arlas_id:polygons', !polygonLayer);
-      this.updateDrawData();
-    }
-  }
-
-  public toggleMesh() {
-    const meshLayer = this.mapComponent.visibilityStatus.get('meshs' + ARLAS_VSET + 'arlas_id:meshs');
-    if (meshLayer !== undefined) {
-      this.mapComponent.visibilityStatus.set('meshs' + ARLAS_VSET + 'arlas_id:meshs', !meshLayer);
-      this.updateDrawData();
-    }
-  }
-
-  private updateDrawData() {
-    const updatedDrawData: FeatureCollection<Geometry> = {
-      type: 'FeatureCollection',
-      features: []
-    }
-
-    const polygonLayer = this.mapComponent.visibilityStatus.get('polygons' + ARLAS_VSET + 'arlas_id:polygons');
-    if (polygonLayer !== undefined && polygonLayer) {
-      updatedDrawData.features = updatedDrawData.features.concat(this.polygonDataToDrow.features);
-    }
-
-    const meshLayer = this.mapComponent.visibilityStatus.get('meshs' + ARLAS_VSET + 'arlas_id:meshs');
-    if (meshLayer !== undefined && meshLayer) {
-      updatedDrawData.features = updatedDrawData.features.concat(this.meshDataToDraw.features);
-    }
-
-    this.drawData = updatedDrawData;
-  }
-
   public polygonChange(event: any) {
     console.log(event);
   }
@@ -169,10 +134,6 @@ export class MapComponent<L, S, M>  {
     console.log(event);
   }
 
-  public onFeatureClick(event: any) {
-    console.log(event);
-  }
-
   public transformRequest = (url: string, resourceType: string) => ({
     url: url.replace('http', 'http'),
   });
@@ -182,10 +143,6 @@ export class MapComponent<L, S, M>  {
   }
 
   public onMapLoaded() {
-    this.mapComponent.visibilityStatus = new Map();
-    this.mapComponent.visibilityStatus.set('polygons' + ARLAS_VSET + 'arlas_id:polygons', true);
-    this.mapComponent.visibilityStatus.set('meshs' + ARLAS_VSET + 'arlas_id:meshs', false);
-
     this.localArlasMapService.getAois().subscribe({
       next: (aois) => {
         this.polygonDataToDrow = aois;
@@ -198,6 +155,35 @@ export class MapComponent<L, S, M>  {
       }
     });
 
-    this.updateDrawData();
+    this.mapComponent.visualisations.subscribe({
+      next: (layers: Set<string>) => this.updateDrawData(layers),
+      error: (err: never) => console.error(err)
+    });
+
+    const layersDisplayed = visualisationSets
+      .filter(vset => vset.enabled === true)
+      .map(vset => vset.layers[0]);
+
+    this.updateDrawData(new Set(layersDisplayed))
+  }
+
+  private updateDrawData(layers: Set<string>) {
+    const polygonLayerName = 'arlas_id:polygon_layer';
+    const meshLayerName = 'arlas_id:mesh_layer';
+
+    const updatedDrawData: FeatureCollection<Geometry> = {
+      type: 'FeatureCollection',
+      features: []
+    }
+
+    if (layers.has(polygonLayerName)) {
+      updatedDrawData.features = updatedDrawData.features.concat(this.polygonDataToDrow.features);
+    }
+
+    if (layers.has(meshLayerName)) {
+      updatedDrawData.features = updatedDrawData.features.concat(this.meshDataToDraw.features);
+    }
+
+    this.drawData = updatedDrawData;
   }
 }

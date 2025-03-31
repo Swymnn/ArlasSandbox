@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { VisualisationSetConfig } from 'arlas-map';
+import { ArlasDataLayer, ArlasMapSource, MapLayers, VisualisationSetConfig } from 'arlas-map';
 
 export const defaultBasemapStyle = {
   name: 'Basic',
@@ -44,138 +44,57 @@ export const geojsondata = {
   'features': []
 };
 
-export const mapLayers = {
+export const mapLayers: MapLayers<ArlasDataLayer> = {
   layers: [{
     id: 'arlas_id:polygon_layer',
     type: 'fill',
-    source: 'feature-_geometry_wkt-window-demo_eo',
-    minzoom: 0,
-    maxzoom: 22,
+    source: 'polygon_map',
     layout: {
       visibility: 'visible'
     },
     paint: {
-      'fill-opacity': 0,
-      'fill-color': [
-        'match',
-        [
-          'get',
-          'metadata_ObservationContext_processusUsed_platform'
-        ],
-        'SENTINEL 2',
-        '#ff61ec',
-        'PLEIADES',
-        '#ec4040',
-        'SPOT 6',
-        '#0087e9',
-        'SPOT 5',
-        '#0041ff',
-        'SPOT 4',
-        '#00b4ff',
-        'SPOT 7',
-        '#1102c6',
-        'TerraSAR-X 1',
-        '#5e5e5e',
-        'ALOS2',
-        '#00c926',
-        'SENTINEL 2A',
-        '#ff0094',
-        'DRONE',
-        '#ffe300',
-        '#9d9ca9'
-      ]
+      'fill-opacity': 1,
+      'fill-color': '#000000'
     },
     metadata: {
-      collection: 'demo_eo',
-      'collection-display-name': 'demo_eo',
+      collection: 'polygon',
+      collectionDisplayName: 'polygon',
       stroke: {
-        'color': [
-          'get',
-          'metadata_ObservationContext_processusUsed_platform_arlas__color'
-        ],
+        'color': '#000000',
         'width': 3,
-        'opacity': 0.7
+        'opacity': 1
       },
-      'is-scrollable-layer': true
+      isScrollableLayer: true
     },
-    filter: [
-      'all',
-      [
-        'all'
-      ]
-    ]
   },
     {
       id: 'arlas_id:mesh_layer',
-      type: 'symbol',
-      source: 'cluster-_centroid_wkt-Coarse-tile-centroid-demo_eo',
-      minzoom: 0,
-      maxzoom: 15,
+      type: 'fill',
+      source: 'mesh_map',
       layout: {
-        visibility: 'visible',
-        'text-field': [
-          'get',
-          'count_:_arlas__short_format'
-        ],
-        'text-font': [
-          'Open Sans Bold',
-          'Arial Unicode MS Bold'
-        ],
-        'text-size': [
-          'interpolate',
-          [
-            'linear'
-          ],
-          [
-            'get',
-            'count_:normalized'
-          ],
-          0,
-          8,
-          0.2,
-          13.2,
-          0.4,
-          18.4,
-          0.6,
-          23.6,
-          0.8,
-          28.8,
-          1,
-          34
-        ],
-        'text-rotate': 0,
-        'text-allow-overlap': true,
-        'text-anchor': 'center',
-        'symbol-placement': 'point'
+        visibility: 'visible'
       },
       paint: {
-        'text-color': '#ffffff',
-        'text-opacity': 1,
-        'text-halo-color': '#000',
-        'text-halo-width': 1.3,
-        'text-halo-blur': 2,
-        'text-translate': [
-          0,
-          0
-        ]
+        'fill-opacity': 1,
+        'fill-color': '#000000'
       },
       metadata: {
-        'collection': 'demo_eo',
-        'collection-display-name': 'demo_eo'
+        collection: 'mesh',
+        collectionDisplayName: 'mesh',
+        stroke: {
+          'color': '#000000',
+          'width': 3,
+          'opacity': 1
+        },
+        isScrollableLayer: true
       },
-      filter: [
-        'all',
-        [
-          'all'
-        ]
-      ]
     }],
   events: {
-    zoomOnClick: [],
-    emitOnClick: [],
-    onHover: []
+    zoomOnClick: new Set(),
+    emitOnClick: new Set(),
+    onHover: new Set(),
   }
-} as any;
+};
 
 export const drawOptions = {
   displayControlsDefault: false,
@@ -186,73 +105,32 @@ export const drawOptions = {
   userProperties: true,
 };
 
-export const mapDataSources = new Set(['feature-_geometry_wkt-window-demo_eo', 'cluster-_centroid_wkt-Coarse-tile-centroid-demo_eo']);
+export const mapDataSources = new Set(['polygon_map', 'mesh_map']);
 
-export const mapSources = [
+export const mapSources: Array<ArlasMapSource<any>> = [
   {
-    'id': 'arlas_id:polygon_layer',
-    'name': 'Polygon',
-    'source': 'feature-_geometry_wkt-window-demo_eo',
-    'minzoom': 0,
-    'maxzoom': 22,
-    'include_fields': [
-      'metadata.ObservationContext.processusUsed.platform'
-    ],
-    'short_form_fields': [],
-    'colors_from_fields': [
-      'metadata.ObservationContext.processusUsed.platform'
-    ],
-    'provided_fields': [],
-    'normalization_fields': [],
-    'metrics': [],
-    'returned_geometry': '_geometry_wkt',
-    'render_mode': 'window'
+    id: 'arlas_id:polygon_layer',
+    source: 'polygon_map',
   },
   {
-    'id': 'arlas_id:mesh_layer',
-    'name': 'Mesh',
-    'source': 'cluster-_centroid_wkt-Coarse-tile-centroid-demo_eo',
-    'minzoom': 0,
-    'maxzoom': 15,
-    'include_fields': [],
-    'short_form_fields': [],
-    'colors_from_fields': [],
-    'provided_fields': [],
-    'normalization_fields': [],
-    'metrics': [
-      {
-        'field': '',
-        'metric': 'count',
-        'normalize': true
-      },
-      {
-        'field': '',
-        'metric': 'count',
-        'normalize': false,
-        'short_format': true
-      }
-    ],
-    'agg_geo_field': '_centroid_wkt',
-    'aggType': 'tile',
-    'granularity': 'Coarse',
-    'minfeatures': 1000,
-    'aggregated_geometry': 'centroid'
-  }
+    id: 'arlas_id:mesh_layer',
+    source: 'mesh_map',
+  },
 ];
 
 export const visualisationSets: Array<VisualisationSetConfig> = [
   {
-    'name': 'Polygon',
-    'layers': [
+    name: 'Polygon',
+    layers: [
       'arlas_id:polygon_layer'
     ],
-    'enabled': true
+    enabled: true
   },
   {
-    'name': 'Mesh',
-    'layers': [
+    name: 'Mesh',
+    layers: [
       'arlas_id:mesh_layer',
     ],
-    'enabled': false
+    enabled: false
   }
 ];
