@@ -1,0 +1,40 @@
+# Docker Compose file for deploying necessary services for ARLAS
+# TODO: Check if these containers are mandatory.
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  arlas-server:
+    image: gisaia/arlas-server:latest
+    container_name: arlas-server
+    depends_on:
+      - elasticsearch
+    environment:
+      - ARLAS_ELASTIC_NODES=http://elasticsearch:9200
+    ports:
+      - "9999:9999"
+    restart: always
+
+  arlas-persistence:
+    image: gisaia/arlas-persistence-server:latest
+    container_name: arlas-persistence
+    depends_on:
+      - arlas-server
+    environment:
+      - ARLAS_SERVER_URL=http://arlas-server:9999
+    ports:
+      - "9998:9998"
+    restart: always
+
+volumes:
+  elasticsearch_data:
+    driver: local
